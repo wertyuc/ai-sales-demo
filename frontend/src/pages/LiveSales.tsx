@@ -11,6 +11,7 @@ import {
   Play,
   Plus,
   Send,
+  ShieldCheck,
   Sparkles,
   Timer,
   User,
@@ -469,6 +470,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   const isCustomer = message.role === "customer";
   const isManager = message.role === "manager";
   const isFollowUp = message.kind === "followup" || message.kind === "reminder";
+  // §21: the guard verdict is visible on the answer itself, not only in Logs
+  const guard = typeof message.meta?.guard === "string" ? message.meta.guard : "";
 
   return (
     <div className={cx("flex", isCustomer ? "justify-start" : "justify-end")}>
@@ -512,6 +515,18 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         >
           {message.text}
         </div>
+        {!isCustomer && !isManager && guard && (
+          <p
+            className={cx(
+              "mt-1 inline-flex items-center gap-1 text-[10px]",
+              guard === "FAILED" ? "text-rose-400" : guard === "PASSED" ? "text-emerald-500/80" : "text-amber-400/90",
+            )}
+            title="Ответ прошёл 12 проверок Response Guard — подробности в разделе Logs / Debug"
+          >
+            <ShieldCheck size={10} />
+            Response validation: {guard === "PASSED_WITH_WARNINGS" ? "PASSED (warnings)" : guard}
+          </p>
+        )}
       </div>
     </div>
   );

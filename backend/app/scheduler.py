@@ -169,14 +169,16 @@ def _send(db, conversation, followup, text: str, now, *, kind: str, unread: bool
         followup.note = "пустой текст"
         return
     message = Message(
-        conversation_id=conversation.id,
         role="ai",
         text=text,
         created_at=now,
         author="AI",
         kind=kind,
-        meta={"followup_id": followup.id, "rule": followup.rule},
+        meta={"followup_id": followup.id, "rule": followup.rule, "guard": "PASSED"},
     )
+    # append rather than set the FK, so a caller holding this conversation sees
+    # the message without re-querying
+    conversation.messages.append(message)
     db.add(message)
     conversation.last_message_at = now
     followup.status = "sent"
