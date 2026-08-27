@@ -1,0 +1,12 @@
+.env
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+.pytest_cache/
+# built SPA copied in for the no-Docker dev path
+backend/static/

@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-200 font-sans antialiased;
+    background-image:
+      radial-gradient(900px 500px at 12% -8%, rgba(99, 102, 241, 0.14), transparent 60%),
+      radial-gradient(700px 420px at 92% 0%, rgba(56, 189, 248, 0.08), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-500;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply bg-ink-850 border border-ink-600 rounded-lg px-3 py-2 text-sm text-slate-100
+           placeholder:text-slate-500 outline-none transition;
+  }
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply border-brand-500 ring-2 ring-brand-500/25;
+  }
+  select option {
+    @apply bg-ink-850;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-ink-900/85 border border-ink-700 rounded-xl shadow-card backdrop-blur-sm;
+  }
+  .card-hover {
+    @apply transition hover:border-ink-600 hover:shadow-pop;
+  }
+  .section-title {
+    @apply text-[11px] font-semibold uppercase tracking-[.12em] text-slate-500;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium
+           transition disabled:opacity-40 disabled:cursor-not-allowed select-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-500 shadow-[0_4px_16px_-6px_rgba(79,70,229,.9)];
+  }
+  .btn-ghost {
+    @apply btn bg-ink-800 text-slate-300 hover:bg-ink-700 hover:text-slate-100 border border-ink-700;
+  }
+  .btn-danger {
+    @apply btn bg-rose-600/90 text-white hover:bg-rose-500;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium
+           border whitespace-nowrap;
+  }
+  .skeleton {
+    @apply relative overflow-hidden bg-ink-800 rounded-md;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  }
+  .scroll-y {
+    @apply overflow-y-auto overscroll-contain;
+  }
+}
+
+/* Recharts adjustments for a dark surface */
+.recharts-cartesian-grid line {
+  stroke: rgba(148, 163, 184, 0.12);
+}
+.recharts-text {
+  fill: #94a3b8;
+  font-size: 11px;
+}
+.recharts-default-tooltip {
+  background: #111527 !important;
+  border: 1px solid #2a3149 !important;
+  border-radius: 10px !important;
+}
