@@ -261,8 +261,15 @@ def daily_report(db: Session, day: dt.date | None = None) -> dict:
 def operational(db: Session) -> dict:
     """Small counters used by the sidebar badges."""
     now = clock_now()
-    open_tasks = db.execute(select(Task).where(Task.status == "open")).scalars().all()
-    overdue = [task for task in open_tasks if task.deadline_at < now]
+    # "overdue" is a status the scheduler writes once the deadline passes, so an
+    # unfinished task is either still open or already flagged — counting only
+    # `open` would show zero the moment the first SLA expired.
+    open_tasks = db.execute(
+        select(Task).where(Task.status.in_(("open", "overdue")))
+    ).scalars().all()
+    overdue = [
+        task for task in open_tasks if task.status == "overdue" or task.deadline_at < now
+    ]
     scheduled = db.execute(
         select(FollowUp).where(FollowUp.status == "scheduled")
     ).scalars().all()
