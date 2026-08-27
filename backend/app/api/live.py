@@ -13,7 +13,7 @@ from ..core import pipeline, settings_store
 from ..core.scenarios import SCENARIOS, by_key
 from ..db import get_db
 from ..llm.factory import provider_info
-from ..models import Conversation, Customer, FollowUp, Message, TurnLog
+from ..models import Conversation, Customer, Event, FollowUp, Meeting, Task, TurnLog
 from ..security import require_user
 from ..views import conversation_summary, intelligence, message_row
 
@@ -173,19 +173,40 @@ def toggle_read_behaviour(conversation_id: int, db: Session = Depends(get_db)) -
 
 @router.delete("/conversations/{conversation_id}")
 def delete_conversation(conversation_id: int, db: Session = Depends(get_db)) -> dict:
+    """Remove a demo conversation and everything that points at it.
+
+    Order matters: events, tasks and meetings hold foreign keys to the lead, so
+    they have to go before the lead itself. Messages are covered by the
+    relationship cascade.
+    """
     conversation = db.get(Conversation, conversation_id)
     if not conversation:
         raise HTTPException(404, "Диалог не найден")
+
+    lead = conversation.lead
+    if lead is not None:
+        for model in (Task, Meeting):
+            for row in db.execute(select(model).where(model.lead_id == lead.id)).scalars().all():
+                db.delete(row)
+
     for row in db.execute(
-        select(FollowUp).where(FollowUp.conversation_id == conversation_id)
+        select(Event).where(
+            (Event.conversation_id == conversation_id)
+            | (Event.lead_id == (lead.id if lead else None))
+        )
     ).scalars().all():
         db.delete(row)
-    for row in db.execute(
-        select(TurnLog).where(TurnLog.conversation_id == conversation_id)
-    ).scalars().all():
-        db.delete(row)
-    if conversation.lead:
-        db.delete(conversation.lead)
+
+    for model in (FollowUp, TurnLog):
+        for row in db.execute(
+            select(model).where(model.conversation_id == conversation_id)
+        ).scalars().all():
+            db.delete(row)
+    db.flush()
+
+    if lead is not None:
+        db.delete(lead)
+        db.flush()
     db.delete(conversation)
     db.commit()
     return {"ok": True}

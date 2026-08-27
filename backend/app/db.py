@@ -34,6 +34,9 @@ if settings.is_sqlite:
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.execute("PRAGMA busy_timeout=15000")
+        # SQLite ignores foreign keys unless asked; without this, dev and tests
+        # accept deletes that Postgres rejects in production
+        cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False, future=True)
