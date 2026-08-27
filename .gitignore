@@ -10,3 +10,4 @@ dist/
 .pytest_cache/
 # built SPA copied in for the no-Docker dev path
 backend/static/
+*.tsbuildinfo
