@@ -82,8 +82,10 @@ postgres (в docker-compose; наружу не публикуется)
 Нужен только Docker.
 
 ```bash
-cd ai-sales-demo
-./deploy.sh
+git clone https://github.com/wertyuc/ai-sales-demo.git
+```
+```bash
+cd ai-sales-demo && ./deploy.sh
 ```
 
 Скрипт создаст `.env` со свежими секретами, соберёт образы, поднимет стек и
